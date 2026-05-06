@@ -1,0 +1,48 @@
+---
+title: "Shipping Fast Without Breaking Things"
+date: "2024-12-10"
+description: "Speed and reliability aren't opposites. Here are the practices that let me ship frequently with confidence."
+tags: ["Engineering", "Productivity"]
+---
+
+There's a common belief that moving fast means breaking things. I've come to think that's a false trade-off — at least past a certain scale.
+
+Here are the practices that have let me ship frequently without regularly causing incidents.
+
+## Small, focused changes
+
+The single most effective thing I've done to ship safely is make smaller changes. A 50-line PR is reviewed faster, deployed with less risk, and easier to roll back if something goes wrong.
+
+When I catch myself writing a large PR, I ask: *can this be split into sequential, independently deployable pieces?* Usually the answer is yes.
+
+## Feature flags
+
+Feature flags let you merge code without activating it for users. This decouples deployment from release — you can ship to production, verify it works, then gradually roll out to users.
+
+This sounds like overhead, but simple boolean flags in a config table or environment variable get you 80% of the value.
+
+## Observability first
+
+Before shipping something new, I ask: *how will I know if this breaks?*
+
+That usually means:
+- Adding a metric or log line that confirms the happy path
+- Making sure errors surface to your alerting system
+- Knowing what "normal" looks like so you can spot anomalies
+
+Deploying without observability is guessing. Deploying with it is an experiment.
+
+## Fast rollback
+
+No matter how careful you are, things break. What matters is how fast you can recover.
+
+Make rollback a first-class concern:
+- Keep deploys reversible (avoid irreversible database migrations)
+- Have runbooks for common incidents
+- Know your rollback command *before* you need it
+
+## The confidence flywheel
+
+Here's the thing about these practices: they compound. Smaller changes mean faster reviews. Faster reviews mean more frequent deploys. More frequent deploys mean smaller blast radius per deploy. Smaller blast radius means less fear, which means faster iteration.
+
+Reliability and speed aren't opposites. Good practices make you faster.

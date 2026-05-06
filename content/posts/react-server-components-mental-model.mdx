@@ -1,0 +1,89 @@
+---
+title: "A Mental Model for React Server Components"
+date: "2025-03-05"
+description: "Server Components change how we think about where code runs. Here's the mental model that made them click for me."
+tags: ["React", "Next.js", "Server Components"]
+---
+
+React Server Components (RSC) have been one of the most conceptually significant changes to React since hooks. But they've also been one of the most confusing. The docs explain *what* they are, but not always *how to think* about them.
+
+Here's the mental model that made them click for me.
+
+## Two trees, not one
+
+Before RSC, there was one component tree. Everything ran in the browser (with SSR optionally pre-rendering it on the server first).
+
+With RSC, there are *two* component trees:
+
+1. **Server tree** — components that run *only* on the server. They can access databases, the filesystem, secrets. They never ship to the browser.
+2. **Client tree** — components that run in the browser (and optionally pre-render on the server too). They can use state, effects, and event handlers.
+
+The key insight: **server components render into client components, not into HTML directly**.
+
+## The serialization boundary
+
+When a server component renders a client component, it passes props across a serialization boundary. This means props must be serializable — no functions, no class instances, no circular references.
+
+```tsx
+// Server component ✅
+async function UserPage({ id }: { id: string }) {
+  const user = await db.users.findById(id); // runs on server
+
+  return <UserCard name={user.name} email={user.email} />;
+  //               ^^^^^ serializable props only
+}
+
+// Client component
+"use client";
+function UserCard({ name, email }: { name: string; email: string }) {
+  const [copied, setCopied] = useState(false);
+  // ...
+}
+```
+
+## The "donut" pattern
+
+A common misconception: you can't put a server component *inside* a client component.
+
+That's not quite right. You can pass server components *as children* to client components:
+
+```tsx
+// Client component
+"use client";
+function Shell({ children }: { children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  return <div>{open ? children : null}</div>;
+}
+
+// Server component — wraps the client component
+async function Page() {
+  const data = await fetchData();
+  return (
+    <Shell>
+      <ServerContent data={data} /> {/* server component as child */}
+    </Shell>
+  );
+}
+```
+
+This "donut" pattern lets you have interactivity (the client shell) while keeping data-fetching on the server (the filling).
+
+## When to use which
+
+The rule of thumb is simple: **start server, go client when you must**.
+
+Use server components for:
+- Data fetching
+- Accessing environment variables / secrets
+- Large dependencies you don't want to ship to the browser
+
+Use client components for:
+- `useState`, `useEffect`, `useContext`
+- Event listeners (`onClick`, `onChange`)
+- Browser-only APIs
+
+## Conclusion
+
+RSC isn't magic — it's a principled split of responsibilities between server and client. Once you internalize the two-tree model and the serialization boundary, most of the "weird" behaviors start to make sense.
+
+The framework is telling you: *be deliberate about where your code runs*.

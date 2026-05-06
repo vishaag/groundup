@@ -1,0 +1,60 @@
+---
+title: "Why I Love TypeScript (And You Should Too)"
+date: "2025-01-20"
+description: "TypeScript isn't just about catching bugs — it's about building confidence in your code at scale."
+tags: ["TypeScript", "JavaScript"]
+---
+
+TypeScript has become one of the most polarizing topics in the JavaScript community. Some developers love it, some find it adds unnecessary friction. I've been on both sides of that argument — and now I'm firmly in the "love it" camp. Here's why.
+
+## The real value isn't bug prevention
+
+The most common pitch for TypeScript is "it catches bugs before runtime." That's true, but it undersells the point.
+
+The real value is **communication**. When you write a function signature in TypeScript, you're documenting what the function expects and what it returns — in a way that's enforced by the compiler and understood by every IDE on the planet.
+
+```ts
+function getUser(id: string): Promise<User | null> {
+  return db.users.findUnique({ where: { id } });
+}
+```
+
+Future you (or a teammate) doesn't need to read the implementation to know what `getUser` does. The signature tells the story.
+
+## Refactoring becomes fearless
+
+The moment TypeScript really clicked for me was during a large refactor. I changed the shape of a core data type and let the compiler guide me to every place in the codebase that needed updating.
+
+Without TypeScript, that kind of change requires:
+- Grepping for usages (and hoping you found them all)
+- Running the app and testing edge cases
+- Reading through code to understand implicit assumptions
+
+With TypeScript, the compiler is your safety net. It won't let you ship until every usage is consistent.
+
+## Generics are worth learning
+
+Generics are the feature most people avoid the longest. They look intimidating at first:
+
+```ts
+function first<T>(arr: T[]): T | undefined {
+  return arr[0];
+}
+```
+
+But once they click, you realize they're just a way to write *flexible but still type-safe* code. You're saying: "I don't care what type this is, but I promise the input and output types will match."
+
+## It's not all perfect
+
+TypeScript does have rough edges:
+- Complex generic types can become hard to read
+- The `any` escape hatch is too tempting
+- Build tooling adds complexity
+
+But these are manageable. The discipline to avoid `any`, use utility types, and keep generics readable — that's just good TypeScript practice.
+
+## Conclusion
+
+If you've been hesitant about TypeScript, I'd encourage you to try it on a greenfield project. Don't use it as a straitjacket — use it as a collaboration tool with your future self and your teammates.
+
+The friction you feel initially is temporary. The confidence you gain is permanent.
